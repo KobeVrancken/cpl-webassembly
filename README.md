@@ -1,4 +1,5 @@
 - [Video](#video)
+- [Introduction](#introduction)
 - [WebAssembly from scratch](#webassembly-from-scratch)
   - [Editor](#editor)
   - [Runtime](#runtime)
@@ -11,8 +12,9 @@
 
 # Video
 
-**TODO**
+[![Bekijk de video](https://img.youtube.com/vi/e77IzFO5a28/hqdefault.jpg)](https://www.youtube.com/playlist?list=PLNALXJPvImgvamymxZXHTUIkeLhkjWIZY)
 
+# Introduction
 
 In the first section of this exercise session we will implement a simple program in pure WebAssembly.
 In this section we will focus purely on the language itself and the security properties it offers.
