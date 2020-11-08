@@ -5,7 +5,7 @@
   - [Runtime](#runtime)
   - [Writing our first WebAssembly function](#writing-our-first-webassembly-function)
   - [Executing our first WebAssembly function](#executing-our-first-webassembly-function)
-  - [Recursion in WebAssembly](#recursion-in-webassembly)
+  - [Recursion](#recursion)
   - [Exploring the type system](#exploring-the-type-system)
   - [Loops](#loops)
   - [WebAssembly System Interface](#webassembly-system-interface)
@@ -121,7 +121,9 @@ $ wasmtime add.wat --invoke add 1 2
 3
 ```
 
-## Recursion in WebAssembly
+* **Exercise** Write a simple WebAssembly function `calc(a, b, c, d)` that returns `a * b - c * d` and test it using `wasmtime`
+
+## Recursion
 
 Take a look at this simple recursive WebAssembly factorial implementation and read the inlined comments:
 
