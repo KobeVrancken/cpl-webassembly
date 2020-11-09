@@ -530,12 +530,12 @@ A [great online tool](https://webassembly.github.io/wabt/demo/wat2wasm/) to expl
 
 ## WebAssembly from AssemblyScript
 
-If you want to write WebAssembly programs from scratch efficiently in a higher level language than C/C++, a great choice of language would be `AssemblyScript`.
+If you want to write WebAssembly programs from scratch efficiently in a higher level language than C/C++, a great choice of language would be (`AssemblyScript`)[https://www.assemblyscript.org/].
 This is a source language specifically designed for compilation to WebAssembly.
 The syntax of the language is heavily inspired by [`TypeScript`](https://www.typescriptlang.org/).
 
-Quote from the AssemblyScript website about the language:
-> One can think of it as if TypeScript and C had a somewhat special child
+Here's a quote from the `AssemblyScript` website about the language:
+> One can think of it as if TypeScript and `C` had a somewhat special child
 
 If you are writing applications for the browser, `AssemblyScript` can be considered a good alternative to `JavaScript`.
 You should in general expect higher performance for CPU intensive computations.
@@ -544,7 +544,7 @@ More info about when to use `AssemblyScript` vs `JavaScript` can be found [here]
 A tool to easily explore `AssemblyScript` can be found in [`WebAssembly studio`](https://webassembly.studio/).
 This online tool internally uses the [`binaryen`](https://github.com/WebAssembly/binaryen) WebAssembly toolchain to compile `AssemblyScript` to `WebAssembly`.
 
-* **Exercise** Rewrite FizzBuzz in `AssemblyScript`. You can choose to use an online editor like [`WebAssembly studio`](https://webassembly.studio) or to install [`binaryen`](https://github.com/WebAssembly/binaryen) and execute compile your AssemblyScript manually.
+* **Exercise** Rewrite FizzBuzz in `AssemblyScript`. You can choose to use an online editor like [`WebAssembly studio`](https://webassembly.studio) or to install [`binaryen`](https://github.com/WebAssembly/binaryen) and execute compile your `AssemblyScript` manually.
 
 # Want more?
 
