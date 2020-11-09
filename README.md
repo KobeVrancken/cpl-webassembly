@@ -13,8 +13,8 @@
 - [WebAssembly as a compilation target](#webassembly-as-a-compilation-target)
   - [WebAssembly from C](#webassembly-from-c)
     - [Undefined behavior](#undefined-behavior)
-  - [WebAssembly from AssemblyScript](#webassembly-from-assemblyscript)
 - [WebAssembly in the browser](#webassembly-in-the-browser)
+  - [WebAssembly from AssemblyScript](#webassembly-from-assemblyscript)
 - [Want more?](#want-more)
 
 # Video
@@ -514,13 +514,38 @@ A lot of this unpredictable behavior is solved by recent languages such as Rust,
 
 * **Exercise** Try to come up with a program that has a different output when you compile it to WebAssembly (e.g. using `clang`) vs when you compile it to your native machine code (e.g. using `gcc`).
 
-## WebAssembly from AssemblyScript
-
-**Coming soon**
 
 # WebAssembly in the browser
 
-**Coming soon**
+Most WebAssembly tutorials will start off with a *Hello, world!* program directly in the browser.
+In this tutorial we've explicitly avoided this approach, to not distract from the core WebAssembly concepts.
+As a replacement, we have used `wasmtime` to execute our `.wasm` programs.
+
+While WebAssembly is not limited to the browser, its main use case today is most certainly high-performance web applications.
+Using JavaScript it is possible to instantiate WebAssembly modules and call functions from these modules directly.
+
+A [great online tool](https://webassembly.github.io/wabt/demo/wat2wasm/) to explore integration of JavaScript and WebAssembly can be found in the demo of the `wat2wasm` tool of the [WebAssembly Binary Toolkit](https://github.com/WebAssembly/wabt).
+
+* **Exercise** Call your own factorial function from JavaScript using WebAssembly. The easiest toolchain to use is probably the [`wat2wasm` demo](https://webassembly.github.io/wabt/demo/wat2wasm/).
+
+## WebAssembly from AssemblyScript
+
+If you want to write WebAssembly programs from scratch efficiently in a higher level language than C/C++, a great choice of language would be `AssemblyScript`.
+This is a source language specifically designed for compilation to WebAssembly.
+The syntax of the language is heavily inspired by [`TypeScript`](https://www.typescriptlang.org/).
+
+Quote from the AssemblyScript website about the language:
+> One can think of it as if TypeScript and C had a somewhat special child
+
+If you are writing applications for the browser, `AssemblyScript` can be considered a good alternative to `JavaScript`.
+You should in general expect higher performance for CPU intensive computations.
+More info about when to use `AssemblyScript` vs `JavaScript` can be found [here](https://www.assemblyscript.org/frequently-asked-questions.html#is-webassembly-always-faster).
+
+A tool to easily explore `AssemblyScript` can be found in [`WebAssembly studio`](https://webassembly.studio/).
+This online tool internally uses the [`binaryen`](https://github.com/WebAssembly/binaryen) WebAssembly toolchain to compile `AssemblyScript` to `WebAssembly`.
+
+* **Exercise** Rewrite FizzBuzz in `AssemblyScript`. You can choose to use an online editor like [`WebAssembly studio`](https://webassembly.studio) or to install [`binaryen`](https://github.com/WebAssembly/binaryen) and execute compile your AssemblyScript manually.
 
 # Want more?
-[Developers guide](https://webassembly.org/getting-started/developers-guide/)
+
+* [Developers guide](https://webassembly.org/getting-started/developers-guide/)
