@@ -535,7 +535,7 @@ This is a source language specifically designed for compilation to WebAssembly.
 The syntax of the language is heavily inspired by [`TypeScript`](https://www.typescriptlang.org/).
 
 Here's a quote from the `AssemblyScript` website about the language:
-> One can think of it as if TypeScript and `C` had a somewhat special child
+> One can think of it as if TypeScript and C had a somewhat special child
 
 If you are writing applications for the browser, `AssemblyScript` can be considered a good alternative to `JavaScript`.
 You should in general expect higher performance for CPU intensive computations.
