@@ -12,8 +12,9 @@
     - [Hello world](#hello-world)
 - [WebAssembly as a compilation target](#webassembly-as-a-compilation-target)
   - [WebAssembly from C](#webassembly-from-c)
+    - [Undefined behavior](#undefined-behavior)
   - [WebAssembly from AssemblyScript](#webassembly-from-assemblyscript)
-  - [WebAssembly in the browser](#webassembly-in-the-browser)
+- [WebAssembly in the browser](#webassembly-in-the-browser)
 - [Want more?](#want-more)
 
 # Video
@@ -358,15 +359,166 @@ Since the file descriptor `1` is chosen, the string is written to the `stdout`.
 
 # WebAssembly as a compilation target
 
+Up until now we have been writing WebAssembly by hand.
+Just like regular assembly, however, WebAssembly is mostly going to be used as a compilation target.
+
+WebAssembly as a compilation target is supported by [`LLVM`](https://en.wikipedia.org/wiki/LLVM), making it possible to compile a wide variety of languages to WebAssembly.
+
+This allows us to write programs in a wide variety of languages and execute these programs on our WebAssembly machine.
+
+
 ## WebAssembly from C
 
-**Coming soon**
+Using [`clang`](https://clang.llvm.org/) it is  possible to compile C programs to WebAssembly.
+At the time of writing, however, the latest releases of `clang` do not yet support the WebAssembly System Interface. Without the System Interface it is only possible to compile pure C code that doesn't perform any system calls. 
+
+Luckily, a special build of `clang` is available in the [`wasi-sdk`](https://github.com/WebAssembly/wasi-sdk).
+
+On Ubuntu, the easiest way to install this version of `clang` would be to download a `.deb` installer from [the latest release](https://github.com/WebAssembly/wasi-sdk/releases/latest).
+For other Linux and MacOS distributions you should be able to use the instructions on [their GitHub](https://github.com/WebAssembly/wasi-sdk).
+Windows users will need to use [MinGW](http://www.mingw.org/), a release for MinGW is provided in the release page.
+
+Once you have install clang, it is time to compile a simple *Hello, world!* program from C to WebAssembly.
+
+```C
+#include <stdio.h>
+ 
+int main(){
+    printf("Hello, world!\n");
+} 
+```
+Now, compile it with your newly installed version of `clang`:
+
+```bash
+/opt/wasi-sdk/bin/clang hello_world.c -o hello_world.wasm
+```
+> :information_source: If you receive an error about `libtinfo.so.5` on Ubuntu, execute the command ```sudo apt install libtinfo5```.
+
+> :information_source: If you are not on Ubuntu or performed a non-default install on Ubuntu, consult the Use instructions on the `wasi-sdk` [GitHub](https://github.com/WebAssembly/wasi-sdk).
+
+
+We can confirm this works by executing our generated `wasm` file with `wasmtime`:
+
+```bash
+wasmtime hello_world.wasm 
+Hello, world!
+```
+
+> :warning: Not all features of the C/C++ languages are supported. On the `wasi-sdk` [GitHub](https://github.com/WebAssembly/wasi-sdk) you can find some current limitations. The most notable one is probably support for multithreading. At the time of writing `WASI` does not yet include an interface for threading.
+
+### Undefined behavior
+
+In C it is possible to write some fun programs, for instance:
+
+```c
+#include <stdio.h>
+
+int main(){
+    int a = 0;
+    int b = 0;
+    int c = 0;
+    int *p = &c;
+    p -= 2;
+    *p = 3;
+    printf("(%p, %p, %p)\n", &a, &b, &c);
+    printf("(%d, %d, %d)\n", a, b, c);
+    return 0;
+}
+```
+The output of this program compiled with `gcc` on my Ubuntu machine is as follows:
+```bash
+$ gcc fun.c -o fun
+$ ./fun
+(0x7fff65ca09e4, 0x7fff65ca09e8, 0x7fff65ca09ec)
+(3, 0, 0)
+```
+The output on your machine might very well be completely different!
+This program takes the address of a variable on the stack (`c`), modifies the address and writes to the new location.
+On my machine this new modified address happened to correspond to the stack value `a`.
+Funnily enough, if I *only* remove the *first* print state ment I get the following output:
+
+```bash
+$ ./fun
+(0, 0, 0)
+```
+
+Is this a bug in the `gcc` compiler?
+No, this is completely intentional.
+`gcc` is free to choose the order in which variables are pushed to the call stack.
+It is the burden of the programmer to not write code that makes implicit assumptions about memory layouts.
+The result the above C program all depends on choices the compiler is allowed to make.
+This is a form of *undefined behavior*.
+From a source code alone you cannot predict the output of this program.
+
+> :bulb: What probably happens in gcc is that whenever we don't explicitly try to print the address of the local variables, it simply optimizes and keeps the local variables in registers. Thus, our random memory overwrite does not correspond to the stack value.
+
+Let's see what happens if we compile to WebAssembly and execute our program:
+
+```bash
+$ /opt/wasi-sdk/bin/clang fun.c -o fun
+$ wasmtime fun
+(0x11278, 0x11274, 0x11270)
+(0, 0, 0)
+```
+Interestingly enough, the call stack was not modified.
+As you can see, however, our local variables were assigned addresses in decreasing order.
+Let's flip the address math in our original C program and increment our pointer instead of decrementing:
+
+```c
+#include <stdio.h>
+
+int main(){
+    int a = 0;
+    int b = 0;
+    int c = 0;
+    int *p = &c;
+    p += 2;
+    *p = 3;
+    printf("(%p, %p, %p)\n", &a, &b, &c);
+    printf("(%d, %d, %d)\n", a, b, c);
+    return 0;
+}
+```
+
+Trying this again:
+
+```bash
+$ /opt/wasi-sdk/bin/clang fun.c -o fun
+$ wasmtime fun
+(0x11278, 0x11274, 0x11270)
+(3, 0, 0)
+```
+
+This works!
+But, if you have been very attentive, this might alarm you.
+Are we not directly overwriting values on our call stack?
+That shouldn't be allowed in WebAssembly.
+What if, instead of writing `p += 2`, we write `p += 3`.
+Suddenly, aren't we overwriting values to which we should *never* have access to?
+
+The answer is, luckily, no.
+In this case, our C compiler used the WebAssembly heap to store these local variables, instead of the call stack.
+When we use the `&`-operator on a local variable, a WebAssembly compiler has no choice but to allocate that local variable somewhere in the heap.
+Stack variables in WebAssembly should be considered as having no address at all and they should be considered immmutable.
+The only legal operations pop and push values to the stack according to the WebAssembly typing rules.
+
+C compilers have a lot of freedom when translating C programs.
+They only have to adhere to the C specifications, and a lot of behavior is left undefined.
+Whenever behavior is undefined at the source level, a compiler is free to choose specific behavior for that code.
+
+WebAssembly will *not* help with this in any way.
+It is not a silver bullet.
+The compiled WebAssembly program will have defined behavior (excluding these [exceptions](https://github.com/WebAssembly/design/blob/master/Nondeterminism.md) but it might not behave exactly as the programmer expected when writing the source C program.
+
+A lot of this unpredictable behavior is solved by recent languages such as Rust, as you've seen in the other module of CPL.
+
+* **Exercise** Try to come up with a program that has a different output when you compile it to WebAssembly (using `clang`) vs when you compile it to your native machine code (e.g. using `gcc`).
 
 ## WebAssembly from AssemblyScript
 
 **Coming soon**
 
-## WebAssembly in the browser
+# WebAssembly in the browser
 
 **Coming soon**
 
