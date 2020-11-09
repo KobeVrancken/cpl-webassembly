@@ -435,7 +435,7 @@ $ ./fun
 The output on your machine might very well be completely different!
 This program takes the address of a variable on the stack (`c`), modifies the address and writes to the new location.
 On my machine this new modified address happened to correspond to the stack value `a`.
-Funnily enough, if I *only* remove the *first* print state ment I get the following output:
+Funnily enough, if I *only* remove the *first* print statement I get the following output:
 
 ```bash
 $ ./fun
@@ -508,11 +508,11 @@ Whenever behavior is undefined at the source level, a compiler is free to choose
 
 WebAssembly will *not* help with this in any way.
 It is not a silver bullet.
-The compiled WebAssembly program will have defined behavior (excluding these [exceptions](https://github.com/WebAssembly/design/blob/master/Nondeterminism.md) but it might not behave exactly as the programmer expected when writing the source C program.
+The compiled WebAssembly program will have defined behavior (excluding these [exceptions])(https://github.com/WebAssembly/design/blob/master/Nondeterminism.md) but it might not behave exactly as the programmer expected when writing the source C program.
 
 A lot of this unpredictable behavior is solved by recent languages such as Rust, as you've seen in the other module of CPL.
 
-* **Exercise** Try to come up with a program that has a different output when you compile it to WebAssembly (using `clang`) vs when you compile it to your native machine code (e.g. using `gcc`).
+* **Exercise** Try to come up with a program that has a different output when you compile it to WebAssembly (e.g. using `clang`) vs when you compile it to your native machine code (e.g. using `gcc`).
 
 ## WebAssembly from AssemblyScript
 
