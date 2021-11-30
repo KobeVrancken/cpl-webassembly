@@ -14,7 +14,7 @@
             local.get $a    ;;stack: a
             local.get $b    ;;stack: b, a
             i32.add         ;;stack: a + b
-            local.get $b    ;;stack: a, a + b
+            local.get $b    ;;stack: b, a + b
             local.set $a    ;;b = a, stack: a + b
             local.set $b    ;;b = a + b, stack: <empty>
 
